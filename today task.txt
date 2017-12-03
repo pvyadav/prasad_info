@@ -1,0 +1,258 @@
+what is add-in:
+ 
+Add-in is a term used, especially by Microsoft, for a software
+program that can be added to a primary 
+An add-in is a supplementalprogram that adds custom commands,
+features to an application,extra functionality to Microsoft Word; 
+
+
+2)Custom Task Panes
+Task panes are user interface panels that are typically docked to one side of a window in a Microsoft Office application.
+Custom task panes give you a way to create your own task pane and provide users with a familiar interface to access your solution's features. 
+For example, the interface can contain controls that run code to modify documents or display data from a data source.
+
+.Benefits of Custom Task Panes
+
+ 1)Familiar User Interface
+.Styles and Formatting task pane in Word.
+.drag custom task panes to any location in the window.
+
+2)Windows Forms Support
+.custom task pane that you create by using the Office development tools in Visual Studio is based on Windows Forms controls.
+.use the data binding support in Windows Forms to bind a data source to controls on the task pane.
+
+
+..Creating a Custom Task Pane
+1)Creating the User Interface.
+custom task panes that are created by using the Office development tools in Visual Studio contain a UserControl object. 
+This user control provides the user interface of your custom task pane. You can create the user control at design time or at run time.
+If you create the user control at design time, we can use the Windows Forms Designer to construct the user interface of your task pane.
+2)Instantiating the Custom Task Pane
+After you create a user control that contains the user interface of the custom task pane, you have to instantiate a CustomTaskPane. 
+To do this, pass the user control to the CustomTaskPaneCollection in your VSTO Add-in by calling one of the Add methods. 
+This collection is exposed as the CustomTaskPanes field of the ThisAddIn class. The following code example is intended to be run from the ThisAddIn class.
+            myUserControl1 = new MyUserControl();
+            myCustomTaskPane = this.CustomTaskPanes.Add(myUserControl1, "My Task Pane");
+            myCustomTaskPane.Visible = true;
+
+The Add methods return a new CustomTaskPane object. 
+You can use this object to modify the appearance of the task pane and to respond to user events.
+
+....Controlling the Task Pane in Multiple Windows
+Custom task panes are associated with a document frame window, which presents a view of a document or item to the user. 
+The task pane is visible only when the associated window is visible.
+.use the appropriate Add method overload when you create the task pane
+
+..Accessing the Application from the Task Pane
+If we want to automate the application from the user control, we can directly access the object model by using Globals.
+ThisAddIn.Application in your code. The static Globals class provides access to the ThisAddIn object.
+The Application field of this object is the entry point into the object model of the application
+
+
+globale Acess
+Microsoft.Office.Tools.Factory
+Microsoft.Office.Tools.Excel.Factory
+Microsoft.Office.Tools.Outlook.Factory
+Microsoft.Office.Tools.Word.Factory
+
+private void button1_Click(object sender, EventArgs e)
+        {
+            Globals.Sheet1.namedRange1.Value2 = this.textBox1.Text;
+        }
+
+..Adding a Custom Task Pane to an Application
+Open or create a VSTO Add-in project for one of the applications listed above. For more information, see How to: Create Office Projects in Visual Studio.
+On the Project menu, click Add User Control.
+In the Add New Item dialog box, change the name of the new user control to MyUserControl, and then click Add.
+The user control opens in the designer.
+Add one or more Windows Forms controls from the Toolbox to the user control.
+Open the ThisAddIn.cs or ThisAddIn.vb code file.
+*Add the following code to the ThisAddIn class. This code declares instances of MyUserControl and CustomTaskPane as members of the ThisAddIn class.
+        private MyUserControl myUserControl1;
+        private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane;
+*Add the following code to the ThisAddIn_Startup event handler. This code creates a new CustomTaskPane by adding the MyUserControl object to the CustomTaskPanes collection.
+The code also displays the task pane.
+             myUserControl1 = new MyUserControl();
+             myCustomTaskPane = this.CustomTaskPanes.Add(myUserControl1, "My Task Pane");
+             myCustomTaskPane.Visible = true;
+
+ *Automating PowerPoint from the Custom Task Pane
+the purpose of vsto add in pur date on first slide of the active peresentation .use the date change eventof to controller to add the selected date wherever is changes.
+
+2)understanding the how to create the First addin in word step by step.
+following steps i followed for the creating first add-in;
+Start Visual Studio.
+On the File menu, point to New, and then click Project.
+In the templates pane, expand Visual C#.
+Under the expanded Office node, select the Office Add-ins node.
+In the list of project templates, select a Word VSTO Add-in project.
+In the Name box, type FirstWordAddIn.
+Click OK.
+
+
+
+
+
+3)Ribbon 
+By using the Ribbon Designer, we create a custom tab and then add and position controls on it.
+
+The Ribbon is a way to organize related commands so that they are easier to find. 
+Commands appear as controls on the Ribbon. 
+Controls are organized into groups along a horizontal strip at the top edge of an application window.
+Related groups are organized on tabs.
+
+
+Ribbon Designer
+The Ribbon Designer is a visual design canvas. 
+Use the Ribbon Designer to add custom tabs, groups,
+and controls to the Ribbon of a Microsoft Office application.
+
+
+Adding a Ribbon (Visual Designer) Item to a Project
+
+..When you add a new Ribbon (Visual Designer) item, Visual Studio automatically adds the following files to your project:
+
+A Ribbon code file. This file has the name that you specify for the Ribbon (Visual Designer) item in the Add New Item dialog box. 
+Add code to handle Ribbon events to this file.
+A Ribbon Designer code file. This file contains code generated by the Ribbon Designer and should not be directly edited.
+A Resource file. This file contains the property values of each control on the Ribbon.
+
+Designing a Ribbon.
+
+The Ribbon Designer contains a default tab and group. You can remove the default tab and group from the Ribbon Designer.
+To remove the default group, right-click Group1, and then click Delete.
+To remove the default tab, right-click an empty area of the design surface, and then click Remove Ribbon Tab.
+
+
+
+..Adding Groups to a Tab
+Groups logically organize controls on the Ribbon. Add groups to tabs. Add all other controls to the group.
+
+..Adding Controls to Groups
+Add one or more controls to a group. The following table describes each control.
+
+Box
+Button
+ButtonGroup
+CheckBox
+ComboBox
+DropDown
+Edit Box
+Gallery
+lable
+Menu
+sepretore
+SplitButton
+toggle button
+
+
+Ribbon Object Model Overview:
+strongly typed object model that you can use to get and set the properties of ribbon controls at run time.
+ex:dynamically populate menu controls
+
+Ribbon class:
+When you add a new Ribbon (Visual Designer) item to a project,Visual Studio adds a Ribbon class to your project. 
+The Ribbon class inherits from the RibbonBase class.
+
+Ribbon Event:
+RibbonBase.Load
+(Raised when the Office application loads the ribbon customization. 
+ The Load event handler is automatically added to the ribbon code file. 
+Use this event handler to run custom code when the ribbon loads.)
+
+RibbonBase.LoadImage:
+(Enables you to cache images in the ribbon customization when the ribbon loads.
+ You can get a slight performance gain if you write code to cache the ribbon images in this event handler.
+ For more information, see LoadImage.)
+
+RibbonBase.Close
+(raised when ribbon intance is closed)
+
+
+RabbinControllers
+
+Namespace: Microsoft.Office.Tools.Ribbon
+
+controlname     classname
+Box             RibbonBox
+Button          RibbonButton
+ButtonGroup     RibbonButtonGroup
+checkBox        RibboncheckBox
+comboBox        RibboncomboBox
+Dropdown        RibbonDropDown
+EditBox         ribbonEditBox
+group           ribbongroup
+lable           Ribbonlable
+Menu            RibbonMenu
+separatore      Ribbonseparatore
+Gellery         RibbonGellery
+spiteButton     RibbonspiteButton
+tab             RibbonTab
+toggleButton    RibbontoggleButton
+
+
+ 
+Hide or show a control.	               Use the Visible property.
+Enable or disable a control.	        Use the Enabled property.
+Set the size of a control.	         Use the ControlSize property.
+Get the image that appears on a control.	Use the Image property.
+Change the label of a control.	         Use the Label property.
+Add user-defined data to a control.	 Use the Tag property.
+                                          Get the items in a RibbonBox, RibbonDropDown, RibbonGallery, or
+
+RibbonSplitButton control.	         Use the Items property.
+
+Add items to a RibbonComboBox, RibbonDropDown, or RibbonGallery control.Use the Items property.
+Add controls to a RibbonMenu.	Use the Items property.
+
+To add controls to the RibbonMenu after the ribbon is loaded into the Office application, you must set the Dynamic property to true before the ribbon is loaded into the Office application. For information, see Setting Properties That Become Read-Only.
+Get the selected item of a RibbonComboBox,
+
+ RibbonDropDown, or RibbonGallery.	Use the SelectedItem property. For a RibbonComboBox, use the Text property.
+Get the groups on a RibbonTab.	Use the Groups property.
+Specify the number of rows and columns that appear in a RibbonGallery.	Use the RowCount and ColumnCount properties.
+
+
+
+Ribbon Control Events
+Click:
+(occured when control is Clicked.)
+TextChange:
+(occured when the text of an edite box or comboBox is changed)
+
+ItemLoading:
+occured when item collection of controll is request by office.office chache the item collection until your 
+code chenges the proparty of the control you tell the M:Microsoft.Office.Core.IRibbonUI.InvalidateControl(System.String) method.
+
+
+Button clicked:
+(Occurs when a button in a RibbonGallery or RibbonDropDown is clicked.)
+
+selectionchanged:
+occure when the selection inRibbonDropDown is changed.
+
+dialoglauncherClick:
+(occure when the dialog launcher icon in lower right cornerof the group is clicked.
+
+
+..content control. 
+Content controls are containers that you can place in a document for containing specific types of content such as dates, lists, pictures, or text. 
+Content controls allow you to create structured blocks of content.
+
+
+
+..Custom XML Parts:
+You can embed XML data in documents for some Microsoft Office applications.
+ When you embed XML data in a document, the data is named a custom XML part.
+
+
+
+https://www.codeproject.com/Articles/556995/ASP-NET-MVC-interview-questions-with-answers#What_is_MVC(Model_view_controller)
+
+
+
+
+https://docs.microsoft.com/en-us/dotnet/api/microsoft.office.tools.word.controlcollection.addplaintextcontentcontrol?view=vsto-2017#Microsoft_Office_Tools_Word_ControlCollection_AddPlainTextContentControl_System_String_
+
+
+https://stackoverflow.com/questions/31833142/visual-studio-signtool-exe-not-found
