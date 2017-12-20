@@ -1,0 +1,433 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO;
+using Microsoft.Office.Interop.Excel;
+
+namespace ExcelAddIn2
+{
+    public partial class UserControl1 : UserControl
+    {
+        private string filename;
+        public Workbook wbkWorkbook1;
+        private string file;
+
+        public UserControl1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            {
+                //textBox1.Enabled = false;
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Filter = "Excell File |*.xlsx;*,xlsx";
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    string extn = Path.GetExtension(ofd.FileName);
+                    if (extn.Equals(".xls") || extn.Equals(".xlsx"))
+                    {
+                        filename = ofd.FileName;
+                        if (filename != "")
+                        {
+                            try
+                            {
+                                string excelfilename = Path.GetFileName(filename);
+                                wbkWorkbook1 = Globals.ThisAddIn.Application.Workbooks.Open(excelfilename);
+                                Microsoft.Office.Interop.Excel.Worksheet activeSheet = Globals.ThisAddIn.Application.ActiveSheet as Microsoft.Office.Interop.Excel.Worksheet;
+                                var G8 = activeSheet.Range["G8", Type.Missing];
+                                var H8 = activeSheet.Range["H8", Type.Missing];
+                                var I8 = activeSheet.Range["I8", Type.Missing];
+                                var J8 = activeSheet.Range["J8", Type.Missing];
+                                var K8 = activeSheet.Range["K8", Type.Missing];
+                                var cell2 = G8.Value + H8.Value + I8.Value + J8.Value + K8.Value;
+                                var cell = activeSheet.Range["M8", Type.Missing];
+                                var content = cell.Value;
+                                if (cell2 == content)
+                                {
+                                    if (content < 40)
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("your Working Hours " + content);
+                                    }
+                                    else if (content == 40)
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + content);
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your weekly hours Calculation is not correct");
+                                    }
+                                }
+                            }
+                            catch (Exception ew)
+                            {
+                                MessageBox.Show("Errror:" + ew.ToString());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            DirectoryInfo d = new DirectoryInfo(@"D:\demo");//Assuming Test is your Folder
+            FileInfo[] Files = d.GetFiles("*.xlsx"); //Getting Text files
+            string str = "";
+            string destFile = @"D:\Timesheetfolders\LessHours\";
+            string destFile1 = @"D:\Timesheetfolders\ValideFile\";
+            foreach (FileInfo file in Files)
+            {
+                str = file.Name;
+                wbkWorkbook1 = Globals.ThisAddIn.Application.Workbooks.Open(str);
+                Microsoft.Office.Interop.Excel.Worksheet activeSheet = Globals.ThisAddIn.Application.ActiveSheet as Microsoft.Office.Interop.Excel.Worksheet;
+                var G8 = activeSheet.Range["G8", Type.Missing];
+                var H8 = activeSheet.Range["H8", Type.Missing];
+                var I8 = activeSheet.Range["I8", Type.Missing];
+                var J8 = activeSheet.Range["J8", Type.Missing];
+                var K8 = activeSheet.Range["K8", Type.Missing];
+                var cell2 = G8.Value + H8.Value + I8.Value + J8.Value + K8.Value;
+                var cell = activeSheet.Range["M8", Type.Missing];
+                var content = cell.Value;
+                if (cell2 == content)
+                {
+                    if (content < 40)
+                    {
+                        File.Copy(str, destFile + Path.GetFileName(str));
+                        System.Windows.Forms.MessageBox.Show("your Working Hours " + content);
+                    }
+                    else if (content == 40)
+                    {
+                        File.Copy(str, destFile1 + Path.GetFileName(str));
+                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + content);
+                    }
+                }
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Excell File |*.xlsx;*,xlsx";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                string extn = Path.GetExtension(ofd.FileName);
+                if (extn.Equals(".xls") || extn.Equals(".xlsx"))
+                {
+                    filename = ofd.FileName;
+                    if (filename != "")
+                    {
+                        string excelfilename = Path.GetFileName(filename);
+                        wbkWorkbook1 = Globals.ThisAddIn.Application.Workbooks.Open(excelfilename);
+                        Microsoft.Office.Interop.Excel.Worksheet activeSheet = Globals.ThisAddIn.Application.ActiveSheet as Microsoft.Office.Interop.Excel.Worksheet;
+                        var Cobj = activeSheet.Range["D3", Type.Missing].Value.Replace(" ", "");
+                        var Dobj = activeSheet.Range["L3", Type.Missing].Text.Replace("/", "");
+                        string Fnameobject = excelfilename.Replace(" ", "").Replace("-", "");
+
+                        //test
+
+                        //var today = DateTime.Today;
+                        //var month = new DateTime(today.Year, today.Month, 1);
+                        //var first = month.AddMonths(-1);
+                        //var last = month.AddDays(-1);
+
+                        //test
+                        if (Fnameobject.Contains(Cobj) && Fnameobject.Contains(Dobj))
+                        {
+                            DateTime nextWednesday = DateTime.Now;
+                            if (nextWednesday.DayOfWeek == DayOfWeek.Friday)
+                            {
+                                nextWednesday = DateTime.Now.AddDays(1);
+                            }
+                            else if (nextWednesday.DayOfWeek == DayOfWeek.Saturday)
+                            {
+                                nextWednesday = DateTime.Now;
+                            }
+                            else if (nextWednesday.DayOfWeek != DayOfWeek.Saturday)
+                            {
+                                while (nextWednesday.DayOfWeek != DayOfWeek.Saturday)
+                                    nextWednesday = nextWednesday.AddDays(-1);
+                            }
+                            DateTime sow = nextWednesday.Date;
+                            string day = sow.ToString().Replace("/", "");
+                            if (day.Contains(Dobj))
+                            {
+                                System.Windows.Forms.MessageBox.Show("Your Name And Date Is Valide");
+                            }
+                            else
+                            {
+                                System.Windows.Forms.MessageBox.Show("Your Name And Date Is not Valide");
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Excell File |*.xlsx;*,xlsx";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                string extn = Path.GetExtension(ofd.FileName);
+                if (extn.Equals(".xls") || extn.Equals(".xlsx"))
+                {
+                    filename = ofd.FileName;
+                    if (filename != "")
+                    {
+                        string excelfilename = Path.GetFileName(filename);
+                        wbkWorkbook1 = Globals.ThisAddIn.Application.Workbooks.Open(excelfilename);
+                        Microsoft.Office.Interop.Excel.Worksheet activeSheet = Globals.ThisAddIn.Application.ActiveSheet as Microsoft.Office.Interop.Excel.Worksheet;
+                        var Cobj = activeSheet.Range["D3", Type.Missing].Value.Replace(" ", "");
+                        var Dobj = activeSheet.Range["L3", Type.Missing].Text.Replace("/", "");
+                        string Fnameobject = excelfilename.Replace(" ", "").Replace("-", "");
+
+                        if (Fnameobject.Contains(Cobj) && Fnameobject.Contains(Dobj))
+                        {
+                            DateTime iDate;
+                            iDate = dateTimePicker1.Value;
+
+                            string day = iDate.ToString().Replace("/", "");
+                            if (day.Contains(Dobj))
+                            {
+                                //test
+                                var today = DateTime.Today;
+                                var month = new DateTime(today.Year, today.Month, 1);
+                                string first = month.AddMonths(-1).ToString("MM/dd/yy");
+                                var last = month.AddDays(-1).ToString("MM/dd/yy");// last Monnth last date for validatting the curren 
+                                var Dobj1 = activeSheet.Range["G7", Type.Missing].Text;
+                                var Dobj2 = activeSheet.Range["H7", Type.Missing].Text;
+                                var Dobj3 = activeSheet.Range["I7", Type.Missing].Text;
+                                var Dobj4 = activeSheet.Range["J7", Type.Missing].Text;
+                                var Dobj5 = activeSheet.Range["K7", Type.Missing].Text;
+                                var cell = activeSheet.Range["M17", Type.Missing].Value;//sum cell 
+                                if (last.Contains(Dobj1))
+                                {
+
+                                    if (cell == 32)
+                                    {
+
+                                        System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                                    }
+                                }
+
+                                else if (last.Contains(Dobj2))
+                                {
+
+                                    if (cell == 24)
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                                    }
+
+                                }
+                                else if (last.Contains(Dobj3))
+                                {
+                                    if (cell == 16)
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                                    }
+
+                                }
+                                else if (last.Contains(Dobj4))
+                                {
+                                    if (cell == 8)
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                                    }
+
+                                }
+                                else if (last.Contains(Dobj5))
+                                {
+                                    if (cell == 40)
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                                    }
+
+                                }
+                                else if (!last.Contains(Dobj1) | !last.Contains(Dobj2) || !last.Contains(Dobj3) || !last.Contains(Dobj4) || !last.Contains(Dobj5))
+                                {
+                                    if (cell == 40)
+                                    {
+                                        System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                                    }
+                                    else
+                                    {
+                                        System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                                    }
+                                }
+
+                                else
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+          }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            DirectoryInfo d = new DirectoryInfo(@"D:\demo");//Assuming Test is your Folder
+            FileInfo[] Files = d.GetFiles("*.xlsx"); //Getting Text files
+            string str = "";
+            string destFile = @"D:\Timesheetfolders\ValideFile\"; 
+            string destFile1 = @"D:\Timesheetfolders\ValidationFailFiles\";
+            foreach (FileInfo file in Files)
+            {
+                str = file.Name;
+                ////Microsoft.Office.Interop.Excel.Application excelApp = new Microsoft.Office.Interop.Excel.Application();
+                ////Workbook excelWorkBook = excelApp.Workbooks.Open(file.FullName);
+                ////Worksheet excelWorkSheet = excelWorkBook.Sheets.Item[0];
+                wbkWorkbook1 = Globals.ThisAddIn.Application.Workbooks.Open(str);
+                Microsoft.Office.Interop.Excel.Worksheet activeSheet = Globals.ThisAddIn.Application.ActiveSheet as Microsoft.Office.Interop.Excel.Worksheet;
+                activeSheet.Visible = XlSheetVisibility.xlSheetVeryHidden;
+                var Cobj = activeSheet.Range["D3", Type.Missing].Value.Replace(" ", "");
+                var Dobj = activeSheet.Range["L3", Type.Missing].Text.Replace("/", "");
+                string Fnameobject = str.Replace(" ", "").Replace("-", "");
+
+                if (Fnameobject.Contains(Cobj) && Fnameobject.Contains(Dobj))
+                {
+                    DateTime iDate;
+                    iDate = dateTimePicker1.Value;
+                     string day = iDate.ToString().Replace("/", "");
+                    if (day.Contains(Dobj))
+                    {
+                        //test
+                        var today = DateTime.Today;
+                        var month = new DateTime(today.Year, today.Month, 1);
+                        string first = month.AddMonths(-1).ToString("MM/dd/yy");
+                        var last = month.AddDays(-1).ToString("MM/dd/yy");// last Monnth last date for validatting the curren 
+                        var Dobj1 = activeSheet.Range["G7", Type.Missing].Text;
+                        var Dobj2 = activeSheet.Range["H7", Type.Missing].Text;
+                        var Dobj3 = activeSheet.Range["I7", Type.Missing].Text;
+                        var Dobj4 = activeSheet.Range["J7", Type.Missing].Text;
+                        var Dobj5 = activeSheet.Range["K7", Type.Missing].Text;
+                        var cell = activeSheet.Range["M17", Type.Missing].Value;//sum cell 
+                        if (last.Contains(Dobj1))
+                        {
+                             if (cell == 32)
+                            {
+                                File.Copy(str, destFile + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                            }
+                            else
+                            {
+                                File.Copy(str, destFile1 + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                            }
+                        }
+                        else if (last.Contains(Dobj2))
+                        {
+                             if (cell == 24)
+                            {
+                                File.Copy(str, destFile + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                            }
+                            else
+                            {
+                                File.Copy(str, destFile1 + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                            }
+                             
+                        }
+                        else if (last.Contains(Dobj3))
+                        {
+                            if (cell == 16)
+                            {
+                                File.Copy(str, destFile + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                            }
+                            else
+                            {
+                                File.Copy(str, destFile1 + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                            }
+
+                        }
+                        else if (last.Contains(Dobj4))
+                        {
+                            if (cell == 8)
+                            {
+                                File.Copy(str, destFile + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                            }
+                            else
+                            {
+                                File.Copy(str, destFile1 + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                            }
+
+                        }
+                        else if (last.Contains(Dobj5))
+                        {
+                            if (cell == 40)
+                            {
+                                File.Copy(str, destFile + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                            }
+                            else
+                            {
+                                File.Copy(str, destFile1 + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                            }
+
+                        }
+                        else if (!last.Contains(Dobj1) | !last.Contains(Dobj2) || !last.Contains(Dobj3) || !last.Contains(Dobj4) || !last.Contains(Dobj5))
+                        {
+                            if (cell == 40)
+                            {
+                                File.Copy(str, destFile + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show("your Working Hours " + cell);
+                            }
+                            else
+                            {
+                                File.Copy(str, destFile1 + Path.GetFileName(str));
+                                System.Windows.Forms.MessageBox.Show(" your Working Hours " + cell);
+                            }
+                        }
+
+                        else
+                        {
+                            File.Copy(str, destFile1 + Path.GetFileName(str));
+                        }
+                    }
+                }
+             
+                    File.Copy(str, destFile1 + Path.GetFileName(str));
+                }
+        }
+        }
+       
+
+    }
